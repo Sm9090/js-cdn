@@ -1,21 +1,22 @@
 console.log("Hello from JavaScript CDN");
 
-async function one() {
-  try {
-    const fetching = await fetch("https://dummyjson.com/products");
-    const data = await fetching.json();
-    console.log(data, "fetching");
-    
-    // Call the render function to pass the fetched data
-    if (window.renderData) {
-      window.renderData(data.products);  // Assuming 'products' is the array you want to render
-    } else {
-      console.error("Render function not found");
-    }
-    console.log(window)
-  } catch (error) {
-    console.log(error);
+function fetchDataAndRender(items) {
+  console.log(items)
+  const container = document.querySelector(".todo-container"); 
+
+  if (container) {
+    container.innerHTML = "";
+
+    items.forEach(item => {
+      const itemElement = document.createElement("div");
+      itemElement.className = "todo-item";
+      itemElement.textContent = item.Title; 
+      container.appendChild(itemElement);
+    });
+  } else {
+    console.error("Container not found for rendering items.");
   }
 }
-one()
-window.fetchDataAndRender = one;
+
+// Expose the function to the global scope
+window.fetchDataAndRender = fetchDataAndRender;
