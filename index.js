@@ -1,22 +1,32 @@
 console.log("Hello from JavaScript CDN");
 
-function fetchDataAndRender(items) {
-  console.log(items)
-  const container = document.querySelector(".todo-container"); 
+async function fetchDataFromCdnList(webUrl, listName) {
+  console.log(webUrl ,"weburl" )
+  console.log(listName ,"listName" )
+  try {
+    const response = await fetch(
+      `${webUrl}/_api/web/lists/getbytitle('${listName}')/items`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json;odata=verbose",
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
-  if (container) {
-    container.innerHTML = "";
+    const data = await response.json();
+    console.log("Data fetched from CdnList:", data.d.results);
 
-    items.forEach(item => {
-      const itemElement = document.createElement("div");
-      itemElement.className = "todo-item";
-      itemElement.textContent = item.Title; 
-      container.appendChild(itemElement);
-    });
-  } else {
-    console.error("Container not found for rendering items.");
+    // Check if the callback function exists on the global window object
+    if (typeof window.spfxRenderCallback === "function") {
+      // Pass fetched data to the SPFx WebPart for rendering
+      window.spfxRenderCallback(data.d.results);
+    }
+  } catch (error) {
+    console.error("Error fetching data from CdnList:", error);
   }
 }
 
-// Expose the function to the global scope
-window.fetchDataAndRender = fetchDataAndRender;
+// Make the function globally accessible
+window.fetchDataFromCdnList = fetchDataFromCdnList;
